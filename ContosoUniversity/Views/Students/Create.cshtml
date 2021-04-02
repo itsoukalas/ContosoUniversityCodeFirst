@@ -7,10 +7,14 @@
 <h2>Create</h2>
 
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm())
 {
-    @Html.AntiForgeryToken()
-    
+    //@Html.AntiForgeryToken(), which works with the ValidateAntiForgeryToken
+    //attribute in the controller to help prevent cross-site request forgery attacks.
+
+
+        @Html.AntiForgeryToken()
+
     <div class="form-horizontal">
         <h4>Student</h4>
         <hr />
@@ -34,7 +38,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.EnrollmentDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.EnrollmentDate, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.EnrollmentDate, new { htmlAttributes = new { @class = "form-control" ,@type="datetime-local" } })
                 @Html.ValidationMessageFor(model => model.EnrollmentDate, "", new { @class = "text-danger" })
             </div>
         </div>
