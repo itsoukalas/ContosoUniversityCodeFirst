@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using ContosoUniversity.DAL;
 using ContosoUniversity.Models;
+using PagedList;
 
 namespace ContosoUniversity.Controllers
 {
@@ -16,10 +17,78 @@ namespace ContosoUniversity.Controllers
         private SchoolContext db = new SchoolContext();
 
         // GET: Students
-        public ActionResult Index()
+        /*
+         * sortOrder για column sort
+         * searchString για το Search box
+         * currentFilter για το paging
+         * page ο αριθμος της σελίδας
+         */
+
+        /*
+         * 
+         * The first time the page is displayed, or if the user hasn't clicked a paging or sorting link,
+         * all the parameters are null. If a paging link is clicked, the page variable
+         * contains the page number to display.
+         * 
+         */
+        public ActionResult Index(string sortOrder,string searchString,string currentFilter, int? page)
         {
-            return View(db.Students.ToList());
+            /**
+             * 
+             * The first time the Index page,there's no query string. 
+             * The students are displayed in ascending order by LastName 
+             * 
+             * The first one specifies that if the sortOrder parameter is null or empty,
+             * ViewBag.NameSortParm should be set to "name_desc"
+             * **/
+
+            //ternary operator
+            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.LastNameSortParm = String.IsNullOrEmpty(sortOrder) ? "last_desc" : "";
+            ViewBag.DateSortParm = sortOrder == "Date" ? "date_desc" : "Date";
+            ViewBag.CurrentSort = sortOrder;
+
+            if (searchString !=null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+
+            var students = from s in db.Students select s;
+
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                students = students.Where(s => s.LastName.Contains(searchString)
+                                       || s.FirstMidName.Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc": case "last_desc":
+                    
+                    students = students.OrderByDescending(s => s.LastName);
+                    break;
+                case "Date":
+                    students = students.OrderBy(s => s.EnrollmentDate);
+                    break;
+                case "date_desc":
+                    students = students.OrderByDescending(s => s.EnrollmentDate);
+                    break;
+                default:
+                    students = students.OrderBy(s => s.LastName);
+                    break;
+            }
+            int pageSize = 3;
+            int pageNumber = (page??1);
+            return View(students.ToPagedList(pageNumber,pageSize));
         }
+
 
         // GET: Students/Details/5
         public ActionResult Details(int? id)
