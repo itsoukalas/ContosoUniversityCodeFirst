@@ -18,7 +18,7 @@ namespace ContosoUniversity.Controllers
 
         // GET: Students
         /*
-         * sortOrder για column sort
+         * sortOrder για column sort links
          * searchString για το Search box
          * currentFilter για το paging
          * page ο αριθμος της σελίδας
@@ -84,7 +84,7 @@ namespace ContosoUniversity.Controllers
                     students = students.OrderBy(s => s.LastName);
                     break;
             }
-            int pageSize = 3;
+            int pageSize = 4;
             int pageNumber = (page??1);
             return View(students.ToPagedList(pageNumber,pageSize));
         }
